@@ -7,12 +7,13 @@
 
 """
 import uuid
+import heapq
 import networkx as nx
 import matplotlib.pyplot as plt
-import heapq
 
 
 class Node:
+    """Node class for tree"""
     def __init__(self, key, color="skyblue"):
         self.left = None
         self.right = None
@@ -24,8 +25,9 @@ class Node:
         return str(self.val)
 
 def add_edges(graph, node, pos, x=0, y=0, layer=1):
+    """Add edges with nodes"""
     if node is not None:
-        graph.add_node(node.id, color=node.color, label=node.val)  # Використання id та збереження значення вузла
+        graph.add_node(node.id, color=node.color, label=node.val) 
         if node.left:
             graph.add_edge(node.id, node.left.id)
             l = x - 1 / 2 ** layer
@@ -39,6 +41,7 @@ def add_edges(graph, node, pos, x=0, y=0, layer=1):
     return graph
 
 def draw_tree(tree_root):
+    """Draw tree"""
     tree = nx.DiGraph()
     pos = {tree_root.id: (0, 0)}
     tree = add_edges(tree, tree_root, pos)
@@ -52,6 +55,7 @@ def draw_tree(tree_root):
     plt.show()
 
 def insert(root, key):
+    """Insert el using queue"""
     if root is None:
         return Node(key)
     queue = [root]
@@ -67,8 +71,8 @@ def insert(root, key):
         queue.append(node.right)
     return root
 
-
 def build_tree(input_list):
+    """ Building tree using heapq"""
     heapq.heapify(input_list)
     # Створення дерева
     root = Node(input_list[0])
@@ -77,7 +81,9 @@ def build_tree(input_list):
 
     return root
 
-input_list = [11, 2, 5, 7, 100, 8, 10, 6, 13, 4, 99]
-tree = build_tree(input_list)
-# Відображення дерева
-draw_tree(tree)
+
+if __name__ == "__main__":
+    input_list = [11, 2, 5, 7, 100, 8, 10, 6, 13, 4, 99]
+    tree = build_tree(input_list)
+    # Відображення дерева
+    draw_tree(tree)
