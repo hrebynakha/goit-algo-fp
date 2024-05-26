@@ -20,26 +20,48 @@
 
 def greedy_algorithm(items, money):
     """Return greed items"""
-    result = []
+    calories, result = 0, []
     for _, values in items.items():
         values['ratio'] = values['calories'] / values['cost']
     items = sorted(items.items(), key=lambda x: x[1]['ratio'], reverse=True)
     iterator = iter(items)
-    current = next(iterator)
     while money > 0:
+        try:
+            current = next(iterator)
+        except StopIteration:
+            break
         if current[1]['cost'] <= money:
             money = money - current[1]['cost']
             if money < 0:
                 # we cannot buy it
                 break
             result.append(current[0])
-        else:
-            try:
-                current = next(iterator)
-            except StopIteration:
-                break
+            calories += current[1]['calories']
+    return calories, result
 
-    return result, money
+
+def dynamic_programming(items,  money):
+    """Dynamic alroritm"""
+    # empty table for save max calories for every money input
+    max_calories = [0] * ( money + 1)
+    selected_items = [[] for _ in range(money + 1)]
+
+    # Cycle for every typr of item
+    for name, item in items.items():
+        cost = item['cost']
+        calories = item['calories']
+        # Update result in table
+        for b in range(money, cost - 1, -1):
+            #print( b, "max_calories", max_calories, selected_items[b])
+            if max_calories[b] < max_calories[b - cost] + calories:
+                max_calories[b] = max_calories[b - cost] + calories
+                selected_items[b] = selected_items[b - cost] + [name]
+
+    # max cal for this budget
+    calories = max_calories[money]
+    # Selected items
+    chosen_items = selected_items[money]
+    return calories, chosen_items
 
 
 items = {
@@ -51,4 +73,6 @@ items = {
     "potato": {"cost": 25, "calories": 350}
 }
 
-print(greedy_algorithm(items, 49))
+money = 75
+print("Greede", greedy_algorithm(items, money))
+print("Dynamic", dynamic_programming(items, money))
