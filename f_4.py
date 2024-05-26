@@ -2,12 +2,15 @@
 Завдання 4. Візуалізація піраміди
 Наступний код виконує побудову бінарних дерев.
 Виконайте аналіз коду, щоб зрозуміти, як він працює.
+Використовуючи як базу цей код, побудуйте функцію, що буде візуалізувати бінарну купу.
+
 
 """
 import uuid
-
 import networkx as nx
 import matplotlib.pyplot as plt
+import heapq
+
 
 class Node:
     def __init__(self, key, color="skyblue"):
@@ -16,6 +19,9 @@ class Node:
         self.val = key
         self.color = color  # Додатковий аргумент для зберігання кольору вузла
         self.id = str(uuid.uuid4())  # Унікальний ідентифікатор для кожного вузла
+
+    def __str__(self, ):
+        return str(self.val)
 
 def add_edges(graph, node, pos, x=0, y=0, layer=1):
     if node is not None:
@@ -45,13 +51,33 @@ def draw_tree(tree_root):
     nx.draw(tree, pos=pos, labels=labels, arrows=False, node_size=2500, node_color=colors)
     plt.show()
 
-# Створення дерева
-root = Node(0)
-root.left = Node(4)
-root.left.left = Node(5)
-root.left.right = Node(10)
-root.right = Node(1)
-root.right.left = Node(3)
+def insert(root, key):
+    if root is None:
+        return Node(key)
+    queue = [root]
+    while queue:
+        node = queue.pop(0)
+        if node.left is None:
+            node.left = insert(node.left, key)
+            break
+        queue.append(node.left)
+        if node.right is None:
+            node.right = insert(node.right, key)
+            break
+        queue.append(node.right)
+    return root
 
+
+def build_tree(input_list):
+    heapq.heapify(input_list)
+    # Створення дерева
+    root = Node(input_list[0])
+    for el in input_list[1:]:
+        root = insert(root, el)
+
+    return root
+
+input_list = [11, 2, 5, 7, 100, 8, 10, 6, 13, 4, 99]
+tree = build_tree(input_list)
 # Відображення дерева
-draw_tree(root)
+draw_tree(tree)
